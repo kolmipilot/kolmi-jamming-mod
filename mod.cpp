@@ -1,0 +1,12 @@
+name = "kolmipilot's Jamming Mod";
+picture = "JammIcon.paa";
+actionName = "GitHub";
+action = "https://github.com/kolmipilot/kolmi-jamming-mod";
+description = "kolmipilot's Jamming Mod";
+logo = "JammIcon.paa";
+logoOver = "JammIcon.paa";
+tooltip = "kolmi Jamming Mod";
+tooltipOwned = "kolmi JAMMING MOD";
+overview = "kolmipilot's Jamming Mod";
+author = "kolmipilot";
+overviewPicture = "JammIcon.paa";
