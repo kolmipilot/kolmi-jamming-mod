@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project name="kolmiJAM">
+    <Package name="jam">
+        <Key ID="str_kolmiJAM_jam_SETTING_EWS_PLANES">
+            <English>EWS Planes</English>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_SETTING_EWS_PLANES_DISC">
+            <English>EWS Planes</English>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_cba_name">
+            <English>kolmi - Jamming</English>
+            <Polish>kolmi - Jamming</Polish>
+        </Key>
+    </Package>
+</Project>

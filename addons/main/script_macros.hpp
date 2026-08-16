@@ -81,5 +81,4 @@
     #define PREP(fncName) [QPATHTOF(functions\DOUBLES(fnc,fncName).sqf), QFUNC(fncName)] call CBA_fnc_compileFunction
 #endif
 
-// Bangalore Debug macros
-#include "\z\kolmiSFCM\addons\main\script_debug.hpp"
+#include "\z\kolmiJAM\addons\main\script_debug.hpp"

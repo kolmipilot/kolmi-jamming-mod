@@ -34,8 +34,9 @@ workshop = [
     "2854286442" # ibc mod
 ]
 
-[ciusmc]
-extends = "rhs"
+[f35]
+extends = "default"
 workshop = [
-    "3720167489" # ibc mod
+    "3517620967", #peral f35
+    "3083512801" #lala intercations sytem
 ]

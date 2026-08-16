@@ -1,7 +1,7 @@
 // COMPONENT should be defined in the script_component.hpp and included BEFORE this hpp
 
 #define MAINPREFIX z
-#define PREFIX kolmiSFCM
+#define PREFIX kolmiJAM
 
 #include "script_version.hpp"
 
@@ -9,13 +9,13 @@
 #define VERSION_STR MAJOR.MINOR.PATCHLVL.BUILD
 #define VERSION_AR  MAJOR,MINOR,PATCHLVL,BUILD
 
-#define KOLMI_SFCM_RADIATE_TAG KOLMI_SFCM_RADIATE
+#define KOLMI_JAM_TAG KOLMI_JAM
 
 // MINIMAL required version for the Mod. Components can specify others..
 #define REQUIRED_VERSION 2.02
 
 #ifdef COMPONENT_BEAUTIFIED
-    #define COMPONENT_NAME QUOTE(kolmiSFCM - COMPONENT_BEAUTIFIED)
+    #define COMPONENT_NAME QUOTE(kolmiJAM - COMPONENT_BEAUTIFIED)
 #else
-    #define COMPONENT_NAME QUOTE(kolmiSFCM - COMPONENT)
+    #define COMPONENT_NAME QUOTE(kolmiJAM - COMPONENT)
 #endif

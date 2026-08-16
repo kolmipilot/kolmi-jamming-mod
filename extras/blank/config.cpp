@@ -6,7 +6,7 @@ class CfgPatches {
         units[] = {};
         weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
-        requiredAddons[] = {"kolmiSFCM_main"};
+        requiredAddons[] = {"kolmiJAM_main"};
         author = "";
         authors[] = {""};
         VERSION_CONFIG;
