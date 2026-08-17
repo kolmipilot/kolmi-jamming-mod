@@ -33,5 +33,14 @@ if (_handlerId >= 0 && {!isNull _plane}) then {
     _plane setVariable [QGVAR(DecmId), -1, true];
 };
 
+// 3) clear the DECM array
+_plane setVariable [QGVAR(decmArray), [], true];
+
+// 4) stop the UI PFH if it's running
+private _uiPfhHandle = _plane getVariable [QGVAR(uiPfhHandle), nil];
+if (!isNil "_uiPfhHandle" && {_uiPfhHandle >= 0}) then {
+    [_uiPfhHandle] call CBA_fnc_removePerFrameHandler;
+    _plane setVariable [QGVAR(uiPfhHandle), nil];
+};
 
 _plane setVariable [QGVAR(DecmActive), false, true];

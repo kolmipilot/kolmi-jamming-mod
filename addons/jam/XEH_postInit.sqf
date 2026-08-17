@@ -57,6 +57,7 @@ if (hasInterface) then {
         }, false, [], true] call CBA_fnc_addClassEventHandler;
     } forEach GVAR(ewsPlanesList);
     }, []] call CBA_fnc_execNextFrame;
+
 };
 
 [QGVAR(disableSensorEvent), {

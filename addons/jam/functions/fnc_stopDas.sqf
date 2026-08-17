@@ -39,4 +39,7 @@ private _dasMarkers = allMapMarkers select {(_x find "LaunchSite_") == 0};
     deleteMarkerLocal _x;
 } forEach _dasMarkers;
 
+// 4) clear the DAS array
+_plane setVariable [QGVAR(dasArray), [], true];
+
 _plane setVariable [QGVAR(DasActive), false, true];

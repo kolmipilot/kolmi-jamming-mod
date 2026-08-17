@@ -54,6 +54,15 @@
     "SLIDER",
     ["DECM missle jamming Interval in s", "DECM missle jamming Interval in s"],
     CBA_SETTINGS_CAT,
-    [0, 60, 2, 0],
+    [0, 60, 5, 0],
+    1
+] call CBA_fnc_addSetting;
+
+[
+    QGVAR(enableVodkaEffect),
+    "CHECKBOX",
+    ["DAS auto flare", "Enable the automatic flare fired by DAS when an incoming missile is detected."],
+    CBA_SETTINGS_CAT,
+    [true],
     1
 ] call CBA_fnc_addSetting;
