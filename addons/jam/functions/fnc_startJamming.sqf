@@ -3,7 +3,7 @@ params ["_plane"];
 
 // Lock state globally instantly
 _plane setVariable [QGVAR(EwsActive), true, true];
-
+TRACE_1("ecm activated for plane:",_plane);
 private _range = GVAR(EcmRange);
 private _sleep_time = GVAR(EcmTime);
 private _cooltime = GVAR(EcmCoolTime);
@@ -20,7 +20,7 @@ private _pylons = getPylonMagazines _plane;
     };
 } forEach _pylons;
 */
-systemChat format["SYSTEM: SENSOR JAMMING INITIATED. TIME: %1 sec", _sleep_time];
+//systemChat format["SYSTEM: SENSOR JAMMING INITIATED. TIME: %1 sec", _sleep_time];
 
 // Detect targets
 private _getunits = _plane nearEntities [["Air", "Tank"], _range];
@@ -31,7 +31,7 @@ private _hostiles = [];
         _hostiles pushBack _x;
     };
 } forEach _getunits;
-
+TRACE_1("ecm for enemies",_hostiles);
 // Disable Sensors utilizing CBA target events natively
 {
     private _unit = _x;

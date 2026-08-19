@@ -159,11 +159,12 @@ private _id = [_plane, "IncomingMissile", {
     _marker setMarkerSizeLocal [_errorRadius, _errorRadius];
     _marker setMarkerAlphaLocal 0.6;
 
+    private _type = if (_vehicle isKindOf "Air") then {"AA"} else {"SAM"};
     private _textMarker = createMarkerLocal [format ["%1_text", _markerName], _randomizedPos];
     _textMarker setMarkerShapeLocal "ICON";
     _textMarker setMarkerTypeLocal "mil_dot";
     _textMarker setMarkerColorLocal "ColorRed";
-    _textMarker setMarkerTextLocal " DAS: Launch Detected";
+    _textMarker setMarkerTextLocal format [" DAS: %1 Launch Detected", _type];
 
 }, [_target, _vehicle], 15] call CBA_fnc_waitAndExecute;
 

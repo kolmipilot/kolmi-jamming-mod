@@ -14,3 +14,5 @@ class CfgPatches {
 };
 
 #include "CfgEventHandlers.hpp"
+#include "HintConfig.hpp"
+#include "CfgUIGrids.hpp"

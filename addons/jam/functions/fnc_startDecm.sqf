@@ -118,7 +118,15 @@ private _id = [_plane, "IncomingMissile", {
                     _target setVariable [QGVAR(dasArray), _dasArray, true];
                 };
                 // Delete the missile immediately
-                deleteVehicle _missile;
+                waitUntil {_missile distance _plane < 500};
+
+                _ewdir = getDir _missile;
+                _ewdir = _ewdir - 180;
+                _missile setDir _ewdir;
+                [{
+                    params ["_mssl"];
+                    deleteVehicle _mssl;
+                }, _missile, 1] call CBA_fnc_waitAndExecute;
             } else {
                 TRACE_2("DECM jam fail",_missile,_target);
             };

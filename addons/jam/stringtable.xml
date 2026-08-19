@@ -11,5 +11,17 @@
             <English>kolmi - Jamming</English>
             <Polish>kolmi - Jamming</Polish>
         </Key>
+        <Key ID="str_kolmiJAM_jam_SettingDisplayTextColorName">
+            <English>Hint Background color</English>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_SettingDisplayTextFontColorDesc">
+            <English>The color of the text font from the  hints. This color is the default color for all text displayed through the ACE Hint system, if the hint text has no other color specified.</English>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_SettingDisplayTextFontColorName">
+            <English>Hint text font color</English>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_settingdisplaytextcolordesc">
+            <English>The color of the background from the ACE hints.</English>
+        </Key>
     </Package>
 </Project>

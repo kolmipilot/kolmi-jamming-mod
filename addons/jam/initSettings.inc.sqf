@@ -66,3 +66,21 @@
     [true],
     1
 ] call CBA_fnc_addSetting;
+
+[
+    QGVAR(displayTextColor),
+    "COLOR",
+    [LSTRING(SettingDisplayTextColorName),LSTRING(SettingDisplayTextColorDesc)],
+    CBA_SETTINGS_CAT,
+    [0, 0, 0, 0.1],
+    0
+] call CBA_fnc_addSetting;
+
+[
+    QGVAR(displayTextFontColor),
+    "COLOR",
+    [LSTRING(SettingDisplayTextFontColorName),LSTRING(SettingDisplayTextFontColorDesc)],
+    CBA_SETTINGS_CAT,
+    [1, 1, 1, 1],
+    0
+] call CBA_fnc_addSetting;
