@@ -33,8 +33,16 @@ if (_handlerId >= 0 && {!isNull _plane}) then {
     _plane setVariable [QGVAR(DecmId), -1, true];
 };
 
-// 3) clear the DECM array
-_plane setVariable [QGVAR(decmArray), [], true];
+// Reset unresolved missile display states when jamming is disabled.
+private _dasArray = _plane getVariable [QGVAR(dasArray), []];
+{
+    private _state = _x param [4, "TRACKING"];
+    if !(_state in ["JAMMED", "DODGED"]) then {
+        _x set [4, "TRACKING"];
+        _x set [5, 0];
+    };
+} forEach _dasArray;
+_plane setVariable [QGVAR(dasArray), _dasArray, true];
 
 // 4) stop the UI PFH if it's running
 private _uiPfhHandle = _plane getVariable [QGVAR(uiPfhHandle), nil];

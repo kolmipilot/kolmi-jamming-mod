@@ -29,24 +29,43 @@ if (!isNil {_plane getVariable QGVAR(uiPfhHandle)}) then {
         params ["_args", "_handle"];
         _args params ["_plane", "_unit", "_lastThreatTime"];
 
+        // Stop the UI if the plane or pilot is dead
+        if (isNull _plane || {!alive _plane} || {!alive _unit}) exitWith {
+            [nil, 0, true] call FUNC(displayHint);
+            [_handle] call CBA_fnc_removePerFrameHandler;
+            _plane setVariable [QGVAR(uiPfhHandle), nil];
+        };
+
         private _dasArray  = _plane getVariable [QGVAR(dasArray),  []];
-        private _decmArray = _plane getVariable [QGVAR(decmArray), []];
+        private _now = time;
 
-        // Clean up stale missiles from DAS array
-        _dasArray = _dasArray select {!(isNull (_x param [0, objNull])) && {alive (_x param [0, objNull])}};
+        // Keep resolved entries for HIDE_DELAY so JAMMED/DODGED stays visible.
+        // Any dead missile that never got a resolved state is marked DODGED here
+        // so it is never dropped as - or shown as - an unresolved TRACKED threat.
+        _dasArray = _dasArray select {
+            private _missile = _x param [0, objNull];
+            private _state = _x param [4, "TRACKING"];
+            private _expiry = _x param [5, 0];
+            private _live = !(isNull _missile) && {alive _missile};
+
+            if (!_live && {!(_state in ["JAMMED", "DODGED"])}) then {
+                _x set [4, "DODGED"];
+                _x set [5, _now + HIDE_DELAY];
+                _state = "DODGED";
+                _expiry = _now + HIDE_DELAY;
+            };
+
+            _live || {_state in ["JAMMED", "DODGED"] && {_now < _expiry}}
+        };
         _plane setVariable [QGVAR(dasArray), _dasArray, true];
-
-        // Clean up stale entries from DECM array
-        _decmArray = _decmArray select {!(isNull (_x param [0, objNull]))};
-        _plane setVariable [QGVAR(decmArray), _decmArray, true];
 
         // Only process UI if player is still in this plane
         if (vehicle _unit isNotEqualTo _plane) exitWith {};
 
-        // ---- Build active missile rows ----
+        // ---- Build missile rows ----
         private _rows         = [];
-        private _hasJammedRadar = false;
-        private _activeMissiles = 0;
+        private _activeMissiles   = 0; // live + undecided (Tracked / Jamming)
+        private _resolvedMissiles = 0; // jammed or dodged, still within expiry
 
         {
             _x params [
@@ -56,45 +75,55 @@ if (!isNil {_plane getVariable QGVAR(uiPfhHandle)}) then {
                 ["_dir",      0, [0]]
             ];
 
-            if (!(isNull _missile) && {alive _missile}) then {
-                _activeMissiles = _activeMissiles + 1;
+            private _state = _x param [4, "TRACKING"];
+            private _isLive = !(isNull _missile) && {alive _missile};
 
-                // Look up jam status from DECM array
-                private _decmEntry = _decmArray findIf {(_x param [0, objNull]) isEqualTo _missile};
-                private _jammed    = false;
-                if (_decmEntry >= 0) then {
-                    _jammed = _decmArray select _decmEntry select 1;
+            // If the missile is already gone but the resolved state never got
+            // written (edge timing), never show it as TRACKED - treat as DODGED.
+            if (!_isLive && {!(_state in ["JAMMED", "DODGED", "JAMMING"])}) then {
+                _state = "DODGED";
+            };
+
+            private _isResolved = _state in ["JAMMED", "DODGED"];
+
+            // _activeMissiles counts ONLY live undecided threats. Resolved
+            // JAMMED/DODGED are counted separately so they stay visible during
+            // their expiry window instead of flipping the title straight to THREAT CLEAR.
+            if (_isLive) then { _activeMissiles = _activeMissiles + 1; };
+            if (_isResolved) then { _resolvedMissiles = _resolvedMissiles + 1; };
+
+            if (_isResolved || _isLive) then {
+                private _color = switch _state do {
+                    case "JAMMING": {"#ff9d00"};
+                    case "JAMMED": {"#00cc44"};
+                    case "DODGED": {"#00cc44"};
+                    default {"#ff4d4d"};
                 };
-
-                // Color: orange if jammed, red if still tracking
-                private _color = ["#ff4d4d", "#ff9d00"] select _jammed;
-                private _label = ["TRACKED", "JAMMED"]  select _jammed;
-
-                if (_seeker isEqualTo "ARH" && _jammed) then { _hasJammedRadar = true; };
+                private _label = switch _state do {
+                    case "JAMMING": {"JAMMING"};
+                    case "JAMMED": {"JAMMED"};
+                    case "DODGED": {"DODGED"};
+                    default {"TRACKED"};
+                };
 
                 _rows pushBack (parseText format [
                     "<t color='%1'>[%2] %3 | %4 m | dir %5</t><br/>",
                     _color, _label, _seeker, round _distance, round _dir
                 ]);
+                TRACE_1("UI rows",_rows);
             };
         } forEach _dasArray;
 
-        // Radar-jam warning row
-        if (_hasJammedRadar) then {
-            _rows pushBack (parseText "<br/><t color='#ff9d00' size='1.1'>RADAR JAMMED!</t>");
-        };
-
-        // ---- Threat timer logic ----
+        // Only undecided (live) threats keep the grace-period clock alive.
         if (_activeMissiles > 0) then {
-            // Threats present – reset the grace-period clock
             _args set [2, time];
             _lastThreatTime = time;
         };
 
         private _timeSinceThreat = time - _lastThreatTime;
 
-        if (_activeMissiles == 0 && _timeSinceThreat >= HIDE_DELAY) exitWith {
-            // Grace period expired – hide hint and stop PFH
+        // Exit only when EVERYTHING is gone - including resolved-but-visible rows.
+        if (_activeMissiles == 0 && {_resolvedMissiles == 0} && {_timeSinceThreat >= HIDE_DELAY}) exitWith {
             TRACE_1("UI PFH stopping - threats cleared",_plane);
             [nil, 0, true] call FUNC(displayHint);
             [_handle] call CBA_fnc_removePerFrameHandler;
@@ -102,13 +131,17 @@ if (!isNil {_plane getVariable QGVAR(uiPfhHandle)}) then {
         };
 
         // ---- Build full display ----
-        // Title row + missile rows (+ optional RADAR JAMMED)
+        // No "THREAT CLEAR" screen: once a missile is resolved you keep seeing
+        // its [JAMMED] / [DODGED] row under the "THREAT RESOLVED" header for the
+        // full HIDE_DELAY. Only an empty title is shown in the trailing grace.
         private _titleRow = if (_activeMissiles > 0) then {
             parseText "<t align='center'><t color='#ff4d4d'>Electronic Warfare System</t></t><br/>"
         } else {
-            // All threats gone/jammed – show CLEAR countdown
-            private _remaining = round (HIDE_DELAY - _timeSinceThreat);
-            parseText format ["<t align='center'><t color='#00cc44'>THREAT CLEAR (%1s)</t></t><br/>", _remaining]
+            if (_resolvedMissiles > 0) then {
+                parseText "<t align='center'><t color='#00cc44'>THREAT RESOLVED</t></t><br/>"
+            } else {
+                parseText ""
+            };
         };
 
         private _allRows  = [_titleRow] + _rows;
@@ -116,7 +149,7 @@ if (!isNil {_plane getVariable QGVAR(uiPfhHandle)}) then {
 
         [_msg, count _allRows] call FUNC(displayHint);
 
-    }, 0.1, [_plane, _unit, 0]] call CBA_fnc_addPerFrameHandler;
+    }, 0.1, [_plane, _unit, time]] call CBA_fnc_addPerFrameHandler;
 
     TRACE_2("UI PFH started",_plane,_pfh);
     _plane setVariable [QGVAR(uiPfhHandle), _pfh, true];

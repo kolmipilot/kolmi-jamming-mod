@@ -7,10 +7,6 @@
         <Key ID="str_kolmiJAM_jam_SETTING_EWS_PLANES_DISC">
             <English>EWS Planes</English>
         </Key>
-        <Key ID="str_kolmiJAM_jam_cba_name">
-            <English>kolmi - Jamming</English>
-            <Polish>kolmi - Jamming</Polish>
-        </Key>
         <Key ID="str_kolmiJAM_jam_SettingDisplayTextColorName">
             <English>Hint Background color</English>
         </Key>
@@ -19,6 +15,10 @@
         </Key>
         <Key ID="str_kolmiJAM_jam_SettingDisplayTextFontColorName">
             <English>Hint text font color</English>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_cba_name">
+            <English>kolmi - Jamming</English>
+            <Polish>kolmi - Jamming</Polish>
         </Key>
         <Key ID="str_kolmiJAM_jam_settingdisplaytextcolordesc">
             <English>The color of the background from the ACE hints.</English>

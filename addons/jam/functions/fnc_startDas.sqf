@@ -23,100 +23,106 @@ private _id = [_plane, "IncomingMissile", {
         _shooter = _instigator;
     };
 
+    private _seeker = "Unknown";
+    private _threats = getSensorThreats _target;
+    TRACE_1("sensor threats",_threats);
+        // 1) missile's own entry sensors only
+        private _ownThreat = _threats param [_threats findIf {(_x select 0) isEqualTo _missile}, [], [[]]];
+        private _own = [];
+        if (count _ownThreat > 0) then {
+            _own = _ownThreat select 2;
+            if (_own isEqualType "") then {
+                _own = [_own];
+            };
+            _own = _own apply {toLower _x};
+        };
+
+        if ("ir" in _own) then { _seeker = "IR" };
+        if (_seeker isEqualTo "Unknown" && {"radar" in _own}) then { _seeker = "ARH" };
+        if (_seeker isEqualTo "Unknown" && {"laser" in _own}) then { _seeker = "Laser" };
+
+        // 2) ACE seeker metadata
+        if (_seeker isEqualTo "Unknown") then {
+            private _ammoCfg = configFile >> "CfgAmmo" >> _ammo >> "ace_missileguidance";
+            private _defaultSeeker = toUpper getText (_ammoCfg >> "defaultSeekerType");
+
+            if (_defaultSeeker in ["SALH", "LIDAR", "SACLOS", "MCLOS"]) then {
+                _seeker = "Laser";
+            } else {
+                if (_defaultSeeker isEqualTo "SARH") then {
+                    _seeker = "ARH";
+                } else {
+                   if (_defaultSeeker in ["THERMAL", "OPTIC"]) then {
+                        _seeker = "IR";
+                    };
+                };
+            };
+        };
+
+        // 3) vanilla lock type
+        if (_seeker isEqualTo "Unknown") then {
+            private _weaponLockCfg = configFile >> "CfgAmmo" >> _ammo >> "weaponLockSystem";
+            private _lockValues = [];
+
+            if (isNumber _weaponLockCfg) then {
+                private _lockSystem = getNumber _weaponLockCfg;
+                {
+                    private _flag = _x;
+                    if ((_lockSystem % (_flag * 2)) >= _flag) then {
+                        _lockValues pushBack _flag;
+                    };
+                } forEach [1, 2, 4, 8, 16];
+            } else {
+                if (isText _weaponLockCfg) then {
+                    private _lockText = toLowerANSI getText _weaponLockCfg;
+                    if (_lockText != "") then {
+                        _lockValues = (_lockText splitString "+") apply {parseNumber _x};
+                    };
+                };
+            };
+
+            if (_lockValues isNotEqualTo []) then {
+                if (2 in _lockValues) then { _seeker = "IR" };
+                if (_seeker isEqualTo "Unknown" && {8 in _lockValues}) then { _seeker = "ARH" };
+                if (_seeker isEqualTo "Unknown" && {4 in _lockValues}) then { _seeker = "Laser" };
+            };
+        };
+
     // Poll this missile until it hits / explodes / disappears
     private _pfh = [{
         params ["_args", "_handle"];
         _args params ["_target", "_missile", "_shooter", "_seeker", "_ammo"];
+
+        // Stop everything if the plane or pilot is dead
+        if (isNull _target || {!alive _target} || {!(isNull (driver _target)) && {!alive (driver _target)}}) exitWith {
+            [_handle] call CBA_fnc_removePerFrameHandler;
+        };
 
         // Stop tracking once the missile is gone
         if (isNull _target || isNull _missile || !alive _missile) exitWith {
             private _dasArray = _target getVariable [QGVAR(dasArray), []];
             private _dasIndex = _dasArray findIf {(_x param [0, objNull]) isEqualTo _missile};
             if (_dasIndex >= 0) then {
-                _dasArray deleteAt _dasIndex;
-                _target setVariable [QGVAR(dasArray), _dasArray, true];
+                private _dasEntry = _dasArray select _dasIndex;
+                private _state = _dasEntry param [4, "TRACKING"];
+                if !(_state in ["JAMMED", "DODGED"]) then {
+                    _dasEntry set [4, "DODGED"];
+                    _dasEntry set [5, time + 7];
+                    _dasArray set [_dasIndex, _dasEntry];
+                };
+            } else {
+                // missile was never logged during tracking - record it as DODGED
+                // so the UI shows the outcome instead of THREAT CLEAR
+                _dasArray pushBack [_missile, _seeker, 0, 0, "DODGED", time + 7];
             };
+            _target setVariable [QGVAR(dasArray), _dasArray, true];
             [_handle] call CBA_fnc_removePerFrameHandler;
         };
 
         private _distanceM = _target distance _missile;
         private _dir = _target getDir _missile;
 
-        // getSensorThreats returns [[object, type, sensors], ...]:
-        //   object  - the missile / marking-locking unit
-        //   type    - "missile" | "locked" | "marked"
-        //   sensors - e.g. ["radar","missile"], ["ir"], ["laser"], ["visual"], ...
         private _threats = getSensorThreats _target;
-        TRACE_1("sensor threats",_threats);
-
-        // Detect the seeker ONCE and cache it in _args, so the label doesn't
-        // flicker while the missile sensor signatures come and go mid-flight.
-        if (_seeker isEqualTo "Unknown") then {
-            // 1) missile's own entry sensors only
-            private _ownThreat = _threats param [_threats findIf {(_x select 0) isEqualTo _missile}, [], [[]]];
-            private _own = [];
-            if (count _ownThreat > 0) then {
-                _own = _ownThreat select 2;
-                if (_own isEqualType "") then {
-                    _own = [_own];
-                };
-                _own = _own apply {toLower _x};
-            };
-
-            if ("ir" in _own) then { _seeker = "IR" };
-            if (_seeker isEqualTo "Unknown" && {"radar" in _own}) then { _seeker = "ARH" };
-            if (_seeker isEqualTo "Unknown" && {"laser" in _own}) then { _seeker = "Laser" };
-
-            // 2) ACE seeker metadata
-            if (_seeker isEqualTo "Unknown") then {
-                private _ammoCfg = configFile >> "CfgAmmo" >> _ammo >> "ace_missileguidance";
-                private _defaultSeeker = toUpper getText (_ammoCfg >> "defaultSeekerType");
-
-                if (_defaultSeeker in ["SALH", "LIDAR", "SACLOS", "MCLOS"]) then {
-                    _seeker = "Laser";
-                } else {
-                    if (_defaultSeeker isEqualTo "SARH") then {
-                        _seeker = "ARH";
-                    } else {
-                        if (_defaultSeeker in ["THERMAL", "OPTIC"]) then {
-                            _seeker = "IR";
-                        };
-                    };
-                };
-            };
-
-            // 3) vanilla lock type
-            if (_seeker isEqualTo "Unknown") then {
-                private _weaponLockCfg = configFile >> "CfgAmmo" >> _ammo >> "weaponLockSystem";
-                private _lockValues = [];
-
-                if (isNumber _weaponLockCfg) then {
-                    private _lockSystem = getNumber _weaponLockCfg;
-                    {
-                        private _flag = _x;
-                        if ((_lockSystem % (_flag * 2)) >= _flag) then {
-                            _lockValues pushBack _flag;
-                        };
-                    } forEach [1, 2, 4, 8, 16];
-                } else {
-                    if (isText _weaponLockCfg) then {
-                        private _lockText = toLowerANSI getText _weaponLockCfg;
-                        if (_lockText != "") then {
-                            _lockValues = (_lockText splitString "+") apply {parseNumber _x};
-                        };
-                    };
-                };
-
-                if (_lockValues isNotEqualTo []) then {
-                    if (2 in _lockValues) then { _seeker = "IR" };
-                    if (_seeker isEqualTo "Unknown" && {8 in _lockValues}) then { _seeker = "ARH" };
-                    if (_seeker isEqualTo "Unknown" && {4 in _lockValues}) then { _seeker = "Laser" };
-                };
-            };
-
-            _args set [3, _seeker];
-        };
-
         // Tag every missile threat with the seeker as a 4th element:
         // [missileObj, "missile", [sensors], seeker]
         private _missileThreats = (_threats select {(_x select 1) isEqualTo "missile"}) apply {
@@ -129,7 +135,10 @@ private _id = [_plane, "IncomingMissile", {
             private _seeker = (_missileThreats select _index) select 3;
             private _dasArray = _target getVariable [QGVAR(dasArray), []];
             private _dasIndex = _dasArray findIf {(_x param [0, objNull]) isEqualTo _missile};
-            private _dasEntry = [_missile, _seeker, _distanceM, _dir];
+            private _oldEntry = if (_dasIndex >= 0) then {_dasArray select _dasIndex} else {[]};
+            private _state = _oldEntry param [4, "TRACKING"];
+            private _expiry = _oldEntry param [5, 0];
+            private _dasEntry = [_missile, _seeker, _distanceM, _dir, _state, _expiry];
 
             if (_dasIndex >= 0) then {
                 _dasArray set [_dasIndex, _dasEntry];
@@ -139,7 +148,9 @@ private _id = [_plane, "IncomingMissile", {
 
             _target setVariable [QGVAR(dasArray), _dasArray, true];
         };
-    }, 1, [_target, _missile, _shooter, "Unknown", _ammo]] call CBA_fnc_addPerFrameHandler;
+    }, 1, [_target, _missile, _shooter, _seeker, _ammo]] call CBA_fnc_addPerFrameHandler;
+
+// launch area traingulation
 
     [{
     params ["_target", "_vehicle"];
@@ -159,7 +170,7 @@ private _id = [_plane, "IncomingMissile", {
     _marker setMarkerSizeLocal [_errorRadius, _errorRadius];
     _marker setMarkerAlphaLocal 0.6;
 
-    private _type = if (_vehicle isKindOf "Air") then {"AA"} else {"SAM"};
+    private _type = ["SAM","AA"] select (_vehicle isKindOf "Air");
     private _textMarker = createMarkerLocal [format ["%1_text", _markerName], _randomizedPos];
     _textMarker setMarkerShapeLocal "ICON";
     _textMarker setMarkerTypeLocal "mil_dot";

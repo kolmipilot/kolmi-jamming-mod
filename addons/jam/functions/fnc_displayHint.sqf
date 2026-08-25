@@ -52,8 +52,8 @@ private _lineH = (((safeZoneW / safeZoneH) min 1.2) / 1.2) / 25;
 private _width = 10;
 private _wPos  = _width * (((safeZoneW / safeZoneH) min 1.2) / 40);
 
-// Height scales with row count; 1.5 accounts for ArmA structured text line spacing
-private _hPos = (_rowCount * _lineH * 1.5) max (2 * _lineH);
+// Height scales with row count; structured text needs extra room for line spacing
+private _hPos = ((_rowCount + 1) * _lineH * 1.8) max (3 * _lineH);
 
 // Use profile-saved position (supports drag-to-move via CfgUIGrids)
 private _xPos = profileNamespace getVariable [
