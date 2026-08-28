@@ -5,15 +5,11 @@ params ["_plane"];
 _plane setVariable [QGVAR(DecmActive), true, true];
 _plane setVariable [QGVAR(DecmPfhs), [], true];
 
-// Catch every missile fired on the plane. Engine event params:
-// _this = [target, ammo, vehicle, instigator, missile]
 private _id = [_plane, "IncomingMissile", {
     params ["_target", "_ammo", "_vehicle", "_instigator", "_missile"];
 
-    // event handlers run in their own scope - take the plane from _thisArgs
     private _plane = _thisArgs;
 
-    // Poll every MissleJammingInterval - classify and update jam status
     private _seeker = "Unknown";
     private _ammoCfg = configFile >> "CfgAmmo" >> _ammo >> "ace_missileguidance";
     private _defaultSeeker = toUpper getText (_ammoCfg >> "defaultSeekerType");
@@ -58,12 +54,10 @@ private _id = [_plane, "IncomingMissile", {
         params ["_args", "_handle"];
         _args params ["_target", "_missile", "_plane", "_ammo", "_seeker"];
 
-        // Stop everything if the plane or pilot is dead
         if (isNull _plane || {!alive _plane} || {!(isNull (driver _plane)) && {!alive (driver _plane)}}) exitWith {
             [_handle] call CBA_fnc_removePerFrameHandler;
         };
 
-        // Stop tracking once the missile is gone
         if (isNull _target || isNull _missile || !alive _missile) exitWith {
             TRACE_2("DECM missile removed",_missile,_target);
             private _pfhs = _plane getVariable [QGVAR(DecmPfhs), []];
@@ -77,7 +71,6 @@ private _id = [_plane, "IncomingMissile", {
 
         TRACE_3("DECM tick",_missile,_ammo,_seeker);
 
-        // For ARH missiles, roll jamming chance
             private _dasArray = _plane getVariable [QGVAR(dasArray), []];
             private _dasIndex = _dasArray findIf {(_x param [0, objNull]) isEqualTo _missile};
             if (_dasIndex >= 0) then {
@@ -85,8 +78,10 @@ private _id = [_plane, "IncomingMissile", {
                 _dasEntry set [4, "JAMMING"];
                 _dasEntry set [5, 0];
                 _dasArray set [_dasIndex, _dasEntry];
-                _plane setVariable [QGVAR(dasArray), _dasArray, true];
+            } else {
+                _dasArray pushBack [_missile, _seeker, 0, 0, "JAMMING", 0];
             };
+            _plane setVariable [QGVAR(dasArray), _dasArray, true];
 
             private _jamRoll = random 100;
             private _jammed = _jamRoll > 100 - GVAR(MissleJammingChance);
@@ -102,16 +97,12 @@ private _id = [_plane, "IncomingMissile", {
                     _dasEntry set [5, time + 7];
                     _dasArray set [_dasIndex, _dasEntry];
                 } else {
-                    // missile was never logged during tracking - record it as
-                    // JAMMED so the UI shows the outcome instead of THREAT CLEAR
                     _dasArray pushBack [_missile, _seeker, 0, 0, "JAMMED", time + 7];
                 };
                 _plane setVariable [QGVAR(dasArray), _dasArray, true];
-                // Immediately refresh UI to show orange/JAMMED state
                 if (vehicle player isEqualTo _target) then {
                     [player] call FUNC(UI);
                 };
-                // Delete the missile immediately
                 if (_missile distance _plane < 500) then {
                     private _ewdir = (getDir _missile) - 180;
                     _missile setDir _ewdir;
