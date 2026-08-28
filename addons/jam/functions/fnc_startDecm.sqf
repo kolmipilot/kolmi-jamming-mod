@@ -14,7 +14,7 @@ private _id = [_plane, "IncomingMissile", {
     private _plane = _thisArgs;
 
     // Poll every MissleJammingInterval - classify and update jam status
-    private _seeker = "";
+    private _seeker = "Unknown";
     private _ammoCfg = configFile >> "CfgAmmo" >> _ammo >> "ace_missileguidance";
     private _defaultSeeker = toUpper getText (_ammoCfg >> "defaultSeekerType");
     if (_defaultSeeker in ["SARH"]) then {

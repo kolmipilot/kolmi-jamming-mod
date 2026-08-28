@@ -59,7 +59,22 @@
 ] call CBA_fnc_addSetting;
 
 [
-    QGVAR(enableVodkaEffect),
+    QGVAR(autoFlareC),
+    "EDITBOX",
+    [LLSTRING(SETTING_EWS_PLANES), LLSTRING(SETTING_EWS_PLANES_DISC)],
+    CBA_SETTINGS_CAT,
+    "params ['_plane'];
+    [_plane, 'Peral_F35B_CM_Launcher'] call BIS_fnc_fire;",
+    1,
+    {
+        // Cache the parsed list; GVAR(ewsPlanes) itself stays the raw CBA setting string
+        missionNamespace setVariable [QGVAR(autoFlareCode), [_this] call FUNC(compileCode), true];
+    },
+    true
+] call CBA_fnc_addSetting;
+
+[
+    QGVAR(enableAutoFlare),
     "CHECKBOX",
     ["DAS auto flare", "Enable the automatic flare fired by DAS when an incoming missile is detected."],
     CBA_SETTINGS_CAT,
@@ -83,4 +98,13 @@
     CBA_SETTINGS_CAT,
     [1, 1, 1, 1],
     0
+] call CBA_fnc_addSetting;
+
+[
+    QGVAR(SensorJammingInterval),
+    "SLIDER",
+    ["S-J jamming Interval in s", "Sensor Jamming jamming Interval in s"],
+    CBA_SETTINGS_CAT,
+    [0, 60, 5, 0],
+    1
 ] call CBA_fnc_addSetting;

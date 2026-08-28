@@ -13,9 +13,10 @@ private _id = [_plane, "IncomingMissile", {
     params ["_target", "_ammo", "_vehicle", "_instigator", "_missile"];
 
     // Event handlers run in their own scope - get the plane via CBA's _thisArgs instead
-    private _plane = _thisArgs;
-    if (GVAR(enableVodkaEffect)) then {
-        [_target, "Peral_F35B_CM_Launcher"] call BIS_fnc_fire;
+    private _plane = _target;
+    if (GVAR(enableAutoFlare)) then {
+        private _code = missionNamespace getVariable [QGVAR(autoFlareCode), {}];
+        _plane call _code;
     };
     // launcher that fired the missile (used to pin the seeker in the tracker)
     private _shooter = _vehicle;

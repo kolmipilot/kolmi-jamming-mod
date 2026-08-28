@@ -1,4 +1,5 @@
 PREP(getList);
+PREP(compileCode);
 PREP(startJamming);
 PREP(stopJamming);
 PREP(startDas);

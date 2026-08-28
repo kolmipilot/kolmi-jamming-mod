@@ -18,14 +18,3 @@ systemChat format["SYSTEM: SENSOR JAMMING COMPLETED. COOLTIME: %1 sec", _cooltim
         };
     };
 } forEach _hostiles;
-
-// Schedule final cooldown reset
-[
-    {
-        params ["_plane"];
-        _plane setVariable [QGVAR(EwsActive), false, true];
-        systemChat "SYSTEM: SENSOR JAMMER STAND-BY.";
-    }, 
-    [_plane], 
-    _cooltime
-] call CBA_fnc_waitAndExecute;

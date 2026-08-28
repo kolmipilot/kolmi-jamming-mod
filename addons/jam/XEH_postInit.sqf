@@ -10,7 +10,7 @@ if (hasInterface) then {
             params ["_unit"];
             diag_log format ["eventhandler init called %1",_unit];
             _unit addAction [
-                "[EWS] OVRD", 
+                "[S-J] OVRD", 
                 {
                     params ["_target", "_caller", "_actionId", "_arguments"];
                     _target call FUNC(startJamming);
