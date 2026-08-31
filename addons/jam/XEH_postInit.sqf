@@ -56,6 +56,7 @@ if (hasInterface) then {
             ];
         }, false, [], true] call CBA_fnc_addClassEventHandler;
     } forEach GVAR(ewsPlanesList);
+    TRACE_1("adding actiosn to planes",GVAR(ewsPlanesList))
     }, []] call CBA_fnc_execNextFrame;
 
 };

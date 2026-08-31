@@ -5,7 +5,7 @@
             <English>EWS Planes</English>
         </Key>
         <Key ID="str_kolmiJAM_jam_SETTING_EWS_PLANES_DISC">
-            <English>EWS Planes</English>
+            <English>EWS Aircraft, Inheritance doesn't work, so if you have one plane in many variants in different classes you need to type every one.</English>
         </Key>
         <Key ID="str_kolmiJAM_jam_SettingDisplayTextColorName">
             <English>Hint Background color</English>

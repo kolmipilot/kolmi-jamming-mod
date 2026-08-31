@@ -4,10 +4,9 @@
     "EDITBOX",
     [LLSTRING(SETTING_EWS_PLANES), LLSTRING(SETTING_EWS_PLANES_DISC)],
     CBA_SETTINGS_CAT,
-    "'Peral_F35B'",
+    "'Peral_F35B', 'B_Plane_Fighter_01_Stealth_F', 'B_Plane_Fighter_01_F'",
     1,
     {
-        // Cache the parsed list; GVAR(ewsPlanes) itself stays the raw CBA setting string
         missionNamespace setVariable [QGVAR(ewsPlanesList), [_this, "CfgVehicles"] call FUNC(getList), true];
     },
     true
@@ -64,7 +63,8 @@
     [LLSTRING(SETTING_EWS_PLANES), LLSTRING(SETTING_EWS_PLANES_DISC)],
     CBA_SETTINGS_CAT,
     "params ['_plane'];
-    [_plane, 'Peral_F35B_CM_Launcher'] call BIS_fnc_fire;",
+    [_plane, 'Peral_F35B_CM_Launcher'] call BIS_fnc_fire;
+    [_plane, 'CMFlareLauncher_Singles'] call BIS_fnc_fire;",
     1,
     {
         // Cache the parsed list; GVAR(ewsPlanes) itself stays the raw CBA setting string
