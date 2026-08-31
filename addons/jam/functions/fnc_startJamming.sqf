@@ -52,13 +52,3 @@ private _pfh = [{
 }, GVAR(SensorJammingInterval), [_range, _sleep_time, _plane, _side, _cooltime, diag_tickTime]] call CBA_fnc_addPerFrameHandler;
 
 _plane setVariable [QGVAR(ecmPfh), _pfh];
-
-[
-    {
-        params ["_plane"];
-        _plane setVariable [QGVAR(EwsActive), false, true];
-        systemChat "SYSTEM: SENSOR JAMMER STAND-BY.";
-    },
-    [_plane],
-    _cooltime
-] call CBA_fnc_waitAndExecute;

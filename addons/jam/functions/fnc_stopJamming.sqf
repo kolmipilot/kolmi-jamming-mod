@@ -1,7 +1,7 @@
 #include "..\script_component.hpp"
 params ["_plane", "_hostiles", "_cooltime"];
 
-systemChat format["SYSTEM: SENSOR JAMMING COMPLETED. COOLTIME: %1 sec", _cooltime];
+systemChat format ["SYSTEM: SENSOR JAMMING COMPLETED. COOLDOWN: %1 sec", _cooltime];
 
 // Restore Sensors where targets live
 {
@@ -18,3 +18,12 @@ systemChat format["SYSTEM: SENSOR JAMMING COMPLETED. COOLTIME: %1 sec", _cooltim
         };
     };
 } forEach _hostiles;
+
+// Stand-by / available again after the cooldown (measured from when jamming ended).
+[{
+    params ["_plane"];
+    if (!isNull _plane) then {
+        _plane setVariable [QGVAR(EwsActive), false, true];
+        systemChat "SYSTEM: SENSOR JAMMER STAND-BY. READY FOR USE.";
+    };
+}, [_plane], _cooltime] call CBA_fnc_waitAndExecute;
