@@ -7,9 +7,9 @@ class CfgPatches {
         weapons[] = {};
         requiredVersion = REQUIRED_VERSION;
         requiredAddons[] = {"ace_common"};
-        author = "";
-        authors[] = {"ACE Team", "Glowbal"};
-        authorUrl = "http://ace3mod.com";
+        author = "kolmipilot";
+        authors[] = {"kolmipilot"};
+        authorUrl = "https://github.com/kolmipilot/kolmi-jamming-mod";
         VERSION_CONFIG;
     };
 };

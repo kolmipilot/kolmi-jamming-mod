@@ -16,3 +16,4 @@ class CfgPatches {
 #include "CfgEventHandlers.hpp"
 #include "HintConfig.hpp"
 #include "CfgUIGrids.hpp"
+#include "Cfg3DEN.hpp"

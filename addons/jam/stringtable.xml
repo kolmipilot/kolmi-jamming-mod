@@ -23,5 +23,41 @@
         <Key ID="str_kolmiJAM_jam_settingdisplaytextcolordesc">
             <English>The color of the background from the ACE hints.</English>
         </Key>
+        <Key ID="str_kolmiJAM_jam_eden_attributecategory">
+            <English>kolmi - Jamming</English>
+            <Polish>kolmi - Jamming</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_hasews_displayname">
+            <English>Add to this plane class EWS</English>
+            <Polish>Dodaj do tej klasy samolotu EWS</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_hasews_description">
+            <English>Adds EWS to all aircraft of this class. Inheritance doesn't work.</English>
+            <Polish>Dodaje do kazdego samolotu tej klasy EWS. Nie dzaiała z dziedziczenie.</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_ecmrange_displayname">
+            <English>ECM Range</English>
+            <Polish>Zakres ECM</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_ecmrange_description">
+            <English>Range of ECM in meters.</English>
+            <Polish>Zasięg ECM w metrach.</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_ecmtime_displayname">
+            <English>ECM Time</English>
+            <Polish>Czas ECM</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_ecmtime_description">
+            <English>Duration of ECM activation in seconds.</English>
+            <Polish>Czas trwania aktywacji ECM w sekundach.</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_ecmcooltime_displayname">
+            <English>ECM Cool Time</English>
+            <Polish>Czas odprężenia ECM</Polish>
+        </Key>
+        <Key ID="str_kolmiJAM_jam_eden_ecmcooltime_description">
+            <English>Time between ECM activations in seconds.</English>
+            <Polish>Czas między aktywacjami ECM w sekundach.</Polish>
+        </Key>
     </Package>
 </Project>

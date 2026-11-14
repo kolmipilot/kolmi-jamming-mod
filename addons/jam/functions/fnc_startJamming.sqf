@@ -10,6 +10,17 @@ private _sleep_time = GVAR(EcmTime);
 private _cooltime = GVAR(EcmCoolTime);
 private _side = side (driver _plane);
 
+private _ewsUnits = missionNamespace getVariable [QGVAR(ewsUnits), []];
+private _index = _ewsUnits findIf {(_x select 0) isEqualTo typeOf _plane};
+
+if (_index != -1) then {
+    private _planeData = _ewsUnits select _index;
+
+    _range = _planeData select 1;
+    _sleep_time = _planeData select 2;
+    _cooltime = _planeData select 3;
+};
+
 _plane setVariable [QGVAR(ecmHostiles), [], true];
 
 private _pfh = [{

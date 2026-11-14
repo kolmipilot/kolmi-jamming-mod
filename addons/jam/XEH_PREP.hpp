@@ -8,3 +8,7 @@ PREP(startDecm);
 PREP(stopDecm);
 PREP(UI);
 PREP(displayHint);
+PREP(setECMRange);
+PREP(setECMTime);
+PREP(setECMCoolTime);
+PREP(setEWS);

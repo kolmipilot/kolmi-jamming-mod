@@ -3,61 +3,63 @@
 missionNamespace setVariable [QGVAR(ewsPlanesList), [GVAR(ewsPlanes), "CfgVehicles"] call FUNC(getList), true];
 
 if (hasInterface) then {
+    private _planes = GVAR(ewsPlanesList) + ((missionNamespace getVariable [QGVAR(ewsUnits), []]) apply {_x select 0});
     [{
+        params ["_planes"];
         {
         diag_log format ["Adding eventhandler init for %1",_x];
         [_x, "Init", {
             params ["_unit"];
             diag_log format ["eventhandler init called %1",_unit];
             _unit addAction [
-                "[S-J] OVRD", 
+                "[S-J] OVRD",
                 {
                     params ["_target", "_caller", "_actionId", "_arguments"];
                     _target call FUNC(startJamming);
-                }, 
-                [], 6, false, false, "", 
+                },
+                [], 6, false, false, "",
                 "(_this in _target) && !(_target getVariable [""kolmiJAM_jam_EwsActive"", false])"
             ];
             _unit addAction [
-                "[DAS] OPR", 
+                "[DAS] OPR",
                 {
                     params ["_target", "_caller", "_actionId", "_arguments"];
                     _target call FUNC(startDas);
-                }, 
-                [], 6, false, false, "", 
+                },
+                [], 6, false, false, "",
                 "(_this in _target) && !(_target getVariable [""kolmiJAM_jam_DasActive"", false])"
             ];
             _unit addAction [
-                "[DAS] OFF", 
+                "[DAS] OFF",
                 {
                     params ["_target", "_caller", "_actionId", "_arguments"];
                     _target call FUNC(stopDas);
-                }, 
-                [], 6, false, false, "", 
+                },
+                [], 6, false, false, "",
                 "(_this in _target) && (_target getVariable [""kolmiJAM_jam_DasActive"", false])"
             ];
             _unit addAction [
-                "[DECM] AUTO", 
+                "[DECM] AUTO",
                 {
                     params ["_target", "_caller", "_actionId", "_arguments"];
                     _target call FUNC(startDecm);
-                }, 
-                [], 6, false, false, "", 
+                },
+                [], 6, false, false, "",
                 "(_this in _target) && !(_target getVariable [""kolmiJAM_jam_DecmActive"", false])"
             ];
             _unit addAction [
-                "[DECM] STBY", 
+                "[DECM] STBY",
                 {
                     params ["_target", "_caller", "_actionId", "_arguments"];
                     _target call FUNC(stopDecm);
-                }, 
-                [], 6, false, false, "", 
+                },
+                [], 6, false, false, "",
                 "(_this in _target) && (_target getVariable [""kolmiJAM_jam_DecmActive"", false])"
             ];
         }, false, [], true] call CBA_fnc_addClassEventHandler;
-    } forEach GVAR(ewsPlanesList);
-    TRACE_1("adding actiosn to planes",GVAR(ewsPlanesList))
-    }, []] call CBA_fnc_execNextFrame;
+    } forEach _planes;
+    TRACE_1("adding actiosn to planes",_planes)
+    }, [_planes]] call CBA_fnc_execNextFrame;
 
 };
 
